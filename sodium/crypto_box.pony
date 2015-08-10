@@ -11,21 +11,21 @@ class CryptoBoxPublicKey val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
-  new val create(buf: ReadSeq[U8] iso) =>
+  new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
 class CryptoBoxSecretKey val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
-  new val create(buf: ReadSeq[U8] iso) =>
+  new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
 class CryptoBoxNonce val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
-  new val create(buf: ReadSeq[U8] iso) =>
+  new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
 primitive CryptoBox
