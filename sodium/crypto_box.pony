@@ -11,6 +11,7 @@ class CryptoBoxPublicKey val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun is_valid(): Bool => _inner.size() == CryptoBox._publickeybytes()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
@@ -18,6 +19,7 @@ class CryptoBoxSecretKey val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun is_valid(): Bool => _inner.size() == CryptoBox._secretkeybytes()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
@@ -25,6 +27,7 @@ class CryptoBoxNonce val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun is_valid(): Bool => _inner.size() == CryptoBox._noncebytes()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
@@ -50,6 +53,7 @@ primitive CryptoBox
     CryptoBoxNonce(consume buf)
   
   fun tag apply(m: String, n: CryptoBoxNonce, pk: CryptoBoxPublicKey, sk: CryptoBoxSecretKey): String? =>
+    if not (n.is_valid() and pk.is_valid() and sk.is_valid()) then error end
     let buf_size = m.size() + _macbytes()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_box_easy[_Int](
@@ -58,6 +62,7 @@ primitive CryptoBox
     consume buf
   
   fun tag open(c: String, n: CryptoBoxNonce, pk: CryptoBoxPublicKey, sk: CryptoBoxSecretKey): String? =>
+    if not (n.is_valid() and pk.is_valid() and sk.is_valid()) then error end
     let buf_size = c.size() - _macbytes()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_box_open_easy[_Int](
