@@ -1,12 +1,6 @@
 
 use "lib:sodium"
 
-// Platform-specific typdefs
-// TODO: detect these based on platform (which Pony doesn't yet do either)
-type _SizeT is U64
-type _UChar is U8
-type _Int   is U32
-
 class CryptoBoxPublicKey val
   let _inner: String
   fun string(): String => _inner
