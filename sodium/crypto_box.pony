@@ -40,17 +40,19 @@ primitive CryptoBox
   fun tag _make_buffer(size: U64): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
   
+  fun tag random_bytes(size: U64): String iso^ =>
+    let buf = _make_buffer(size)
+    @randombytes_buf[None](buf.cstring(), size)
+    buf
+  
+  fun tag nonce(): CryptoBoxNonce =>
+    CryptoBoxNonce(random_bytes(_noncebytes()))
+  
   fun tag keypair(): (CryptoBoxPublicKey, CryptoBoxSecretKey)? =>
     let pk_size = _publickeybytes(); let pk = _make_buffer(pk_size)
     let sk_size = _secretkeybytes(); let sk = _make_buffer(sk_size)
     if 0 != @crypto_box_keypair[_Int](pk.cstring(), sk.cstring()) then error end
     (CryptoBoxPublicKey(consume pk), CryptoBoxSecretKey(consume sk))
-  
-  fun tag nonce(): CryptoBoxNonce =>
-    let buf_size = _noncebytes()
-    let buf = _make_buffer(buf_size)
-    @randombytes_buf[None](buf.cstring(), buf_size)
-    CryptoBoxNonce(consume buf)
   
   fun tag apply(m: String, n: CryptoBoxNonce, pk: CryptoBoxPublicKey, sk: CryptoBoxSecretKey): String? =>
     if not (n.is_valid() and pk.is_valid() and sk.is_valid()) then error end
