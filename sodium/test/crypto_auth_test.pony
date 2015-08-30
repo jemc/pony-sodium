@@ -10,6 +10,9 @@ class CryptoAuthTest is UnitTest
     let key = CryptoAuth.key()
     let mac = CryptoAuth("My message!", key)
     
+    h.assert_eq[U64](key.string().size(), CryptoAuth.key_size())
+    h.assert_eq[U64](mac.string().size(), CryptoAuth.mac_size())
+    
     CryptoAuth.verify("My message!", key, mac)
     
     try CryptoAuth.verify("Some other message!", key, mac)

@@ -11,6 +11,10 @@ class CryptoSecretBoxTest is UnitTest
     let nonce = CryptoSecretBox.nonce()
     let crypt = CryptoSecretBox("My secret!", nonce, key)
     
+    h.assert_eq[U64](key  .string().size(), CryptoSecretBox.key_size())
+    h.assert_eq[U64](nonce.string().size(), CryptoSecretBox.nonce_size())
+    h.assert_eq[U64](crypt.string().size(), CryptoSecretBox.mac_size() + "My secret!".size())
+    
     let message = CryptoSecretBox.open(crypt, nonce, key)
     h.expect_eq[String](message, "My secret!")
     

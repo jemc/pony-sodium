@@ -5,7 +5,7 @@ class CryptoAuthKey val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
-  fun is_valid(): Bool => _inner.size() == CryptoAuth._keybytes()
+  fun is_valid(): Bool => _inner.size() == CryptoAuth.key_size()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
@@ -13,13 +13,13 @@ class CryptoAuthMac val
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
-  fun is_valid(): Bool => _inner.size() == CryptoAuth._bytes()
+  fun is_valid(): Bool => _inner.size() == CryptoAuth.mac_size()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
 primitive CryptoAuth
-  fun tag _bytes(): U64    => @crypto_auth_bytes[_SizeT]().u64()
-  fun tag _keybytes(): U64 => @crypto_auth_keybytes[_SizeT]().u64()
+  fun tag key_size(): U64 => @crypto_auth_keybytes[_SizeT]().u64()
+  fun tag mac_size(): U64 => @crypto_auth_bytes[_SizeT]().u64()
   
   fun tag _make_buffer(size: U64): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
@@ -30,11 +30,11 @@ primitive CryptoAuth
     buf
   
   fun tag key(): CryptoAuthKey =>
-    CryptoAuthKey(random_bytes(_keybytes()))
+    CryptoAuthKey(random_bytes(key_size()))
   
   fun tag apply(m: String, k: CryptoAuthKey): CryptoAuthMac? =>
     if not k.is_valid() then error end
-    let buf = _make_buffer(_bytes())
+    let buf = _make_buffer(mac_size())
     if 0 != @crypto_auth[_Int](
       buf.cstring(), m.cstring(), m.size(), k.cstring()
     ) then error end
