@@ -76,7 +76,7 @@ primitive CryptoBox
     CryptoBoxPublicKey(consume buf)
   
   fun tag scalar_mult(pk: CryptoBoxPublicKey, sk: CryptoBoxSecretKey): String? =>
-    if not sk.is_valid() then error end
+    if not (pk.is_valid() and sk.is_valid()) then error end
     let buf = _make_buffer(scalar_size())
     if 0 != @crypto_scalarmult[_Int](
       buf.cstring(), sk.cstring(), pk.cstring()
