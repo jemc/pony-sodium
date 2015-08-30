@@ -30,6 +30,7 @@ primitive CryptoBox
   fun tag secret_key_size(): U64 => @crypto_box_secretkeybytes[_SizeT]().u64()
   fun tag nonce_size(): U64      => @crypto_box_noncebytes[_SizeT]().u64()
   fun tag mac_size(): U64        => @crypto_box_macbytes[_SizeT]().u64()
+  fun tag scalar_size(): U64     => @crypto_scalarmult_bytes[_SizeT]().u64()
   
   fun tag _make_buffer(size: U64): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
@@ -66,3 +67,18 @@ primitive CryptoBox
     ) then error end
     consume buf
   
+  fun tag scalar_mult_base(sk: CryptoBoxSecretKey): CryptoBoxPublicKey? =>
+    if not sk.is_valid() then error end
+    let buf = _make_buffer(public_key_size())
+    if 0 != @crypto_scalarmult_base[_Int](
+      buf.cstring(), sk.cstring()
+    ) then error end
+    CryptoBoxPublicKey(consume buf)
+  
+  fun tag scalar_mult(pk: CryptoBoxPublicKey, sk: CryptoBoxSecretKey): String? =>
+    if not sk.is_valid() then error end
+    let buf = _make_buffer(scalar_size())
+    if 0 != @crypto_scalarmult[_Int](
+      buf.cstring(), sk.cstring(), pk.cstring()
+    ) then error end
+    (consume buf)

@@ -39,4 +39,23 @@ class CryptoBoxTest is UnitTest
       h.assert_failed("Cyril shouldn't be able to open Bob's message to Alice.")
     end
     
+    ///
+    // Scalar multiplication (Diffie-Hellman) tests
+    
+    h.assert_eq[U64](CryptoBox.scalar_size(), CryptoBox.public_key_size())
+    h.assert_eq[U64](CryptoBox.scalar_size(), CryptoBox.secret_key_size())
+    
+    if not (apk.string() == CryptoBox.scalar_mult_base(ask).string()) then
+      h.assert_failed("Alice's public key should be derivable from her secret key.")
+    end
+    
+    if not (bpk.string() == CryptoBox.scalar_mult_base(bsk).string()) then
+      h.assert_failed("Bob's public key should be derivable from his secret key.")
+    end
+    
+    if not (CryptoBox.scalar_mult(apk, bsk).string()
+         == CryptoBox.scalar_mult(bpk, ask).string()) then
+      h.assert_failed("Alice and Bob's keys should be able to derive a shared secret.")
+    end
+    
     true
