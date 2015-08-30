@@ -9,3 +9,4 @@ actor Main is TestList
     test(CryptoAuthTest)
     test(CryptoSecretBoxTest)
     test(CryptoBoxTest)
+    test(CryptoHashTest)
