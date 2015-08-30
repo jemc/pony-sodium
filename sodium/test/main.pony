@@ -6,5 +6,6 @@ actor Main is TestList
   new make() => None
   
   fun tag tests(test: PonyTest) =>
+    test(CryptoAuthTest)
     test(CryptoSecretBoxTest)
     test(CryptoBoxTest)
