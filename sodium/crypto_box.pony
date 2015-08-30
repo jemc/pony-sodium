@@ -81,4 +81,4 @@ primitive CryptoBox
     if 0 != @crypto_scalarmult[_Int](
       buf.cstring(), sk.cstring(), pk.cstring()
     ) then error end
-    (consume buf)
+    consume buf
