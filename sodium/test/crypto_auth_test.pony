@@ -15,11 +15,11 @@ class CryptoAuthTest is UnitTest
     
     CryptoAuth.verify("My message!", key, mac)
     
-    try CryptoAuth.verify("Some other message!", key, mac)
+    try CryptoAuth.verify("Bad message", key, mac)
       h.assert_failed("Shouldn't verify if given the wrong message.")
     end
     
-    let mac' = CryptoAuth("Some other message!", key)
+    let mac' = CryptoAuth("Bad message", key)
     try CryptoAuth.verify("My message!", key, mac')
       h.assert_failed("Shouldn't verify if given the wrong mac tag.")
     end
