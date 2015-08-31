@@ -6,7 +6,13 @@ actor Main is TestList
   new make() => None
   
   fun tag tests(test: PonyTest) =>
-    test(CryptoAuthTest)
-    test(CryptoSecretBoxTest)
-    test(CryptoBoxTest)
+    // Secret-key cryptography (single-key)
+    test(CryptoSecretBoxTest) // Authenticated encryption (encrypted messages)
+    test(CryptoAuthTest)      // Authentication           (tagged messages)
+    
+    // Public-key cryptography (keypairs)
+    test(CryptoBoxTest)       // Authenticated encryption (encrypted messages)
+    test(CryptoSignTest)      // Public-key signatures    (tagged messages)
+    
+    // Hashing
     test(CryptoHashTest)
