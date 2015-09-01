@@ -6,6 +6,7 @@ class CryptoSignSecretKey val
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
   fun is_valid(): Bool => _inner.size() == CryptoSign.secret_key_size()
+  fun val to_curve(): CryptoBoxSecretKey? => CryptoSign._secret_key_to_curve(this)
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
@@ -14,6 +15,7 @@ class CryptoSignPublicKey val
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
   fun is_valid(): Bool => _inner.size() == CryptoSign.public_key_size()
+  fun val to_curve(): CryptoBoxPublicKey? => CryptoSign._public_key_to_curve(this)
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
@@ -76,3 +78,21 @@ primitive CryptoSign
     if 0 != @crypto_sign_verify_detached[_Int](
       t.cstring(), m.cstring(), m.size(), pk.cstring()
     ) then error end
+  
+  fun tag _secret_key_to_curve(sk: CryptoSignSecretKey): CryptoBoxSecretKey? =>
+    if not sk.is_valid() then error end
+    let buf_size = CryptoBox.secret_key_size()
+    let buf = _make_buffer(buf_size)
+    if 0 != @crypto_sign_ed25519_sk_to_curve25519[_Int](
+      buf.cstring(), sk.cstring()
+    ) then error end
+    CryptoBoxSecretKey(consume buf)
+  
+  fun tag _public_key_to_curve(pk: CryptoSignPublicKey): CryptoBoxPublicKey? =>
+    if not pk.is_valid() then error end
+    let buf_size = CryptoBox.public_key_size()
+    let buf = _make_buffer(buf_size)
+    if 0 != @crypto_sign_ed25519_pk_to_curve25519[_Int](
+      buf.cstring(), pk.cstring()
+    ) then error end
+    CryptoBoxPublicKey(consume buf)

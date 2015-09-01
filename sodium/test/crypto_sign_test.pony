@@ -60,4 +60,25 @@ class CryptoSignTest is UnitTest
       h.assert_failed("Shouldn't verify if given the wrong key.")
     end
     
+    ///
+    // Convert to CryptoBox (curve) keys and use with normal CryptoBox keys
+    
+    (let ask, let apk) = (sk.to_curve(), pk.to_curve())
+    (let bsk, let bpk) = CryptoBox.keypair()
+    
+    h.assert_eq[U64](ask.string().size(), CryptoBox.secret_key_size())
+    h.assert_eq[U64](apk.string().size(), CryptoBox.public_key_size())
+    
+    let nonce = CryptoBox.nonce()
+    let crypt = CryptoBox("Hello, Bob!", nonce, ask, bpk)
+    
+    let message = CryptoBox.open(crypt, nonce, bsk, apk)
+    h.expect_eq[String](message, "Hello, Bob!")
+    
+    let nonce' = CryptoBox.nonce()
+    let crypt' = CryptoBox("Hi, Alice!", nonce', bsk, apk)
+    
+    let message' = CryptoBox.open(crypt', nonce', ask, bpk)
+    h.expect_eq[String](message', "Hi, Alice!")
+    
     true
