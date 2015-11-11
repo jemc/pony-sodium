@@ -1,7 +1,7 @@
 
 use "lib:sodium"
 
-class CryptoAuthKey val
+class val CryptoAuthKey
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
@@ -9,7 +9,7 @@ class CryptoAuthKey val
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
-class CryptoAuthMac val
+class val CryptoAuthMac
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()

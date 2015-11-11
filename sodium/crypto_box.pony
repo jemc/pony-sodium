@@ -1,7 +1,7 @@
 
 use "lib:sodium"
 
-class CryptoBoxSecretKey val
+class val CryptoBoxSecretKey
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
@@ -9,7 +9,7 @@ class CryptoBoxSecretKey val
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
-class CryptoBoxPublicKey val
+class val CryptoBoxPublicKey
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
@@ -17,7 +17,7 @@ class CryptoBoxPublicKey val
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
-class CryptoBoxNonce val
+class val CryptoBoxNonce
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()

@@ -1,7 +1,7 @@
 
 use "lib:sodium"
 
-class CryptoSignSecretKey val
+class val CryptoSignSecretKey
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
@@ -10,7 +10,7 @@ class CryptoSignSecretKey val
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
-class CryptoSignPublicKey val
+class val CryptoSignPublicKey
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
@@ -19,7 +19,7 @@ class CryptoSignPublicKey val
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.append(consume buf) end
 
-class CryptoSignMac val
+class val CryptoSignMac
   let _inner: String
   fun string(): String => _inner
   fun cstring(): Pointer[U8] tag => _inner.cstring()
@@ -51,7 +51,7 @@ primitive CryptoSign
     var buf_size: _SizeT = m.size() + mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_sign[_Int](
-      buf.cstring(), &buf_size, m.cstring(), m.size(), sk.cstring()
+      buf.cstring(), addressof buf_size, m.cstring(), m.size(), sk.cstring()
     ) then error end
     consume buf
   
@@ -60,7 +60,7 @@ primitive CryptoSign
     var buf_size: _SizeT = c.size() - mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_sign_open[_Int](
-      buf.cstring(), &buf_size, c.cstring(), c.size(), pk.cstring()
+      buf.cstring(), addressof buf_size, c.cstring(), c.size(), pk.cstring()
     ) then error end
     consume buf
   
@@ -69,7 +69,7 @@ primitive CryptoSign
     var buf_size: _SizeT = mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_sign_detached[_Int](
-      buf.cstring(), &buf_size, m.cstring(), m.size(), sk.cstring()
+      buf.cstring(), addressof buf_size, m.cstring(), m.size(), sk.cstring()
     ) then error end
     CryptoSignMac(consume buf)
   
