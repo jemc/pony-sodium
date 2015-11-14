@@ -1,7 +1,6 @@
 
 use "ponytest"
 use ".."
-use "../../../pony-zmq/zmq/inspect"
 
 class CryptoSignTest is UnitTest
   new iso create() => None
