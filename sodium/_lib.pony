@@ -6,7 +6,6 @@ primitive _Lib
     @sodium_init[None]()
 
 // Platform-specific typdefs
-// TODO: detect these based on platform (which Pony doesn't yet do either)
-type _SizeT is U64
+// TODO: detect these based on platform
 type _UChar is U8
 type _Int   is U32

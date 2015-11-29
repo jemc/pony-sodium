@@ -11,16 +11,16 @@ class CryptoBoxTest is UnitTest
     (let bsk, let bpk) = CryptoBox.keypair() // Bob's   public and secret key
     (let csk, let cpk) = CryptoBox.keypair() // Cyril's public and secret key
     
-    h.assert_eq[U64](ask.string().size(), CryptoBox.secret_key_size())
-    h.assert_eq[U64](apk.string().size(), CryptoBox.public_key_size())
+    h.assert_eq[USize](ask.string().size(), CryptoBox.secret_key_size())
+    h.assert_eq[USize](apk.string().size(), CryptoBox.public_key_size())
     
     let nonce = CryptoBox.nonce()
     
-    h.assert_eq[U64](nonce.string().size(), CryptoBox.nonce_size())
+    h.assert_eq[USize](nonce.string().size(), CryptoBox.nonce_size())
     
     let crypt = CryptoBox("Hello, Bob!", nonce, ask, bpk)
     
-    h.assert_eq[U64](crypt.size(), CryptoBox.mac_size() + "Hello, Bob!".size())
+    h.assert_eq[USize](crypt.size(), CryptoBox.mac_size() + "Hello, Bob!".size())
     
     let message = CryptoBox.open(crypt, nonce, bsk, apk)
     h.expect_eq[String](message, "Hello, Bob!")
@@ -42,8 +42,8 @@ class CryptoBoxTest is UnitTest
     ///
     // Scalar multiplication (Diffie-Hellman) tests
     
-    h.assert_eq[U64](CryptoBox.scalar_size(), CryptoBox.secret_key_size())
-    h.assert_eq[U64](CryptoBox.scalar_size(), CryptoBox.public_key_size())
+    h.assert_eq[USize](CryptoBox.scalar_size(), CryptoBox.secret_key_size())
+    h.assert_eq[USize](CryptoBox.scalar_size(), CryptoBox.public_key_size())
     
     if not (apk.string() == CryptoBox.scalar_mult_base(ask).string()) then
       h.assert_failed("Alice's public key should be derivable from her secret key.")

@@ -11,7 +11,7 @@ class CryptoHashTest is UnitTest
     
     let sha256_hash = CryptoHash.sha256(message)
     
-    h.assert_eq[U64](sha256_hash.size(), CryptoHash.sha256_size())
+    h.assert_eq[USize](sha256_hash.size(), CryptoHash.sha256_size())
     
     try h.assert_eq[String](sha256_hash, CryptoHash.sha256(message)) else
       h.assert_failed("Should have been a deterministic SHA-256 hash.")
@@ -19,7 +19,7 @@ class CryptoHashTest is UnitTest
     
     let sha512_hash = CryptoHash.sha512(message)
     
-    h.assert_eq[U64](sha512_hash.size(), CryptoHash.sha512_size())
+    h.assert_eq[USize](sha512_hash.size(), CryptoHash.sha512_size())
     
     try h.assert_eq[String](sha512_hash, CryptoHash.sha512(message)) else
       h.assert_failed("Should have been a deterministic SHA-512 hash.")

@@ -9,15 +9,15 @@ class CryptoSignTest is UnitTest
   fun apply(h: TestHelper): TestResult? =>
     (let sk, let pk) = CryptoSign.keypair()
     
-    h.assert_eq[U64](sk.string().size(), CryptoSign.secret_key_size())
-    h.assert_eq[U64](pk.string().size(), CryptoSign.public_key_size())
+    h.assert_eq[USize](sk.string().size(), CryptoSign.secret_key_size())
+    h.assert_eq[USize](pk.string().size(), CryptoSign.public_key_size())
     
     ///
     // Attached mode
     
     let signed = CryptoSign("My message!", sk)
     
-    h.assert_eq[U64](signed.size(), CryptoSign.mac_size() + "My message!".size())
+    h.assert_eq[USize](signed.size(), CryptoSign.mac_size() + "My message!".size())
     
     CryptoSign.open(signed, pk)
     
@@ -27,7 +27,7 @@ class CryptoSignTest is UnitTest
       h.assert_failed("Shouldn't verify if given a forged signed message.")
     end
     
-    let lifted = signed.substring(0, (CryptoSign.mac_size().i64() - 1))
+    let lifted = signed.substring(0, (CryptoSign.mac_size().isize() - 1))
                + "Bad message"
     try CryptoSign.open(lifted, pk)
       h.assert_failed("Shouldn't verify if given a lifted-signature message.")
@@ -42,7 +42,7 @@ class CryptoSignTest is UnitTest
     
     let mac = CryptoSign.detached("My message!", sk)
     
-    h.assert_eq[U64](mac.string().size(), CryptoSign.mac_size())
+    h.assert_eq[USize](mac.string().size(), CryptoSign.mac_size())
     
     CryptoSign.verify_detached("My message!", pk, mac)
     
@@ -65,8 +65,8 @@ class CryptoSignTest is UnitTest
     (let ask, let apk) = (sk.to_curve(), pk.to_curve())
     (let bsk, let bpk) = CryptoBox.keypair()
     
-    h.assert_eq[U64](ask.string().size(), CryptoBox.secret_key_size())
-    h.assert_eq[U64](apk.string().size(), CryptoBox.public_key_size())
+    h.assert_eq[USize](ask.string().size(), CryptoBox.secret_key_size())
+    h.assert_eq[USize](apk.string().size(), CryptoBox.public_key_size())
     
     let nonce = CryptoBox.nonce()
     let crypt = CryptoBox("Hello, Bob!", nonce, ask, bpk)

@@ -18,13 +18,13 @@ class val CryptoAuthMac
     _inner = recover String.append(consume buf) end
 
 primitive CryptoAuth
-  fun tag key_size(): U64 => @crypto_auth_keybytes[_SizeT]().u64()
-  fun tag mac_size(): U64 => @crypto_auth_bytes[_SizeT]().u64()
+  fun tag key_size(): USize => @crypto_auth_keybytes[USize]().usize()
+  fun tag mac_size(): USize => @crypto_auth_bytes[USize]().usize()
   
-  fun tag _make_buffer(size: U64): String iso^ =>
+  fun tag _make_buffer(size: USize): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
   
-  fun tag random_bytes(size: U64): String iso^ =>
+  fun tag random_bytes(size: USize): String iso^ =>
     let buf = _make_buffer(size)
     @randombytes_buf[None](buf.cstring(), size)
     buf

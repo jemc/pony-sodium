@@ -26,16 +26,16 @@ class val CryptoBoxNonce
     _inner = recover String.append(consume buf) end
 
 primitive CryptoBox
-  fun tag secret_key_size(): U64 => @crypto_box_secretkeybytes[_SizeT]().u64()
-  fun tag public_key_size(): U64 => @crypto_box_publickeybytes[_SizeT]().u64()
-  fun tag nonce_size(): U64      => @crypto_box_noncebytes[_SizeT]().u64()
-  fun tag mac_size(): U64        => @crypto_box_macbytes[_SizeT]().u64()
-  fun tag scalar_size(): U64     => @crypto_scalarmult_bytes[_SizeT]().u64()
+  fun tag secret_key_size(): USize => @crypto_box_secretkeybytes[USize]().usize()
+  fun tag public_key_size(): USize => @crypto_box_publickeybytes[USize]().usize()
+  fun tag nonce_size(): USize      => @crypto_box_noncebytes[USize]().usize()
+  fun tag mac_size(): USize        => @crypto_box_macbytes[USize]().usize()
+  fun tag scalar_size(): USize     => @crypto_scalarmult_bytes[USize]().usize()
   
-  fun tag _make_buffer(size: U64): String iso^ =>
+  fun tag _make_buffer(size: USize): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
   
-  fun tag random_bytes(size: U64): String iso^ =>
+  fun tag random_bytes(size: USize): String iso^ =>
     let buf = _make_buffer(size)
     @randombytes_buf[None](buf.cstring(), size)
     buf

@@ -28,14 +28,14 @@ class val CryptoSignMac
     _inner = recover String.append(consume buf) end
 
 primitive CryptoSign
-  fun tag secret_key_size(): U64 => @crypto_sign_secretkeybytes[_SizeT]().u64()
-  fun tag public_key_size(): U64 => @crypto_sign_publickeybytes[_SizeT]().u64()
-  fun tag mac_size(): U64        => @crypto_sign_bytes[_SizeT]().u64()
+  fun tag secret_key_size(): USize => @crypto_sign_secretkeybytes[USize]().usize()
+  fun tag public_key_size(): USize => @crypto_sign_publickeybytes[USize]().usize()
+  fun tag mac_size(): USize        => @crypto_sign_bytes[USize]().usize()
   
-  fun tag _make_buffer(size: U64): String iso^ =>
+  fun tag _make_buffer(size: USize): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
   
-  fun tag random_bytes(size: U64): String iso^ =>
+  fun tag random_bytes(size: USize): String iso^ =>
     let buf = _make_buffer(size)
     @randombytes_buf[None](buf.cstring(), size)
     buf
@@ -48,7 +48,7 @@ primitive CryptoSign
   
   fun tag apply(m: String, sk: CryptoSignSecretKey): String? =>
     if not sk.is_valid() then error end
-    var buf_size: _SizeT = m.size() + mac_size()
+    var buf_size: USize = m.size() + mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_sign[_Int](
       buf.cstring(), addressof buf_size, m.cstring(), m.size(), sk.cstring()
@@ -57,7 +57,7 @@ primitive CryptoSign
   
   fun tag open(c: String, pk: CryptoSignPublicKey): String? =>
     if not pk.is_valid() then error end
-    var buf_size: _SizeT = c.size() - mac_size()
+    var buf_size: USize = c.size() - mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_sign_open[_Int](
       buf.cstring(), addressof buf_size, c.cstring(), c.size(), pk.cstring()
@@ -66,7 +66,7 @@ primitive CryptoSign
   
   fun tag detached(m: String, sk: CryptoSignSecretKey): CryptoSignMac? =>
     if not sk.is_valid() then error end
-    var buf_size: _SizeT = mac_size()
+    var buf_size: USize = mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_sign_detached[_Int](
       buf.cstring(), addressof buf_size, m.cstring(), m.size(), sk.cstring()

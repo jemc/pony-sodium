@@ -2,10 +2,10 @@
 use "lib:sodium"
 
 primitive CryptoHash
-  fun tag sha256_size(): U64 => @crypto_hash_sha256_bytes[_SizeT]().u64()
-  fun tag sha512_size(): U64 => @crypto_hash_sha512_bytes[_SizeT]().u64()
+  fun tag sha256_size(): USize => @crypto_hash_sha256_bytes[USize]().usize()
+  fun tag sha512_size(): USize => @crypto_hash_sha512_bytes[USize]().usize()
   
-  fun tag _make_buffer(size: U64): String iso^ =>
+  fun tag _make_buffer(size: USize): String iso^ =>
     recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
   
   fun tag sha256(m: String): String =>
