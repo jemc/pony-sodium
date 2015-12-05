@@ -22,7 +22,9 @@ primitive CryptoAuth
   fun tag mac_size(): USize => @crypto_auth_bytes[USize]().usize()
   
   fun tag _make_buffer(size: USize): String iso^ =>
-    recover String.from_cstring(@pony_alloc[Pointer[U8]](size), size) end
+    recover String.from_cstring(
+      @pony_alloc[Pointer[U8]](@pony_ctx[Pointer[None] iso](), size), size
+    ) end
   
   fun tag random_bytes(size: USize): String iso^ =>
     let buf = _make_buffer(size)
