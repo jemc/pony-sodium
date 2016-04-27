@@ -6,7 +6,7 @@ class CryptoSignTest is UnitTest
   new iso create() => None
   fun name(): String => "sodium.CryptoSign"
   
-  fun apply(h: TestHelper): TestResult? =>
+  fun apply(h: TestHelper)? =>
     (let sk, let pk) = CryptoSign.keypair()
     
     h.assert_eq[USize](sk.string().size(), CryptoSign.secret_key_size())
@@ -24,17 +24,17 @@ class CryptoSignTest is UnitTest
     let forged = CryptoSign.random_bytes(CryptoSign.mac_size())
                + "My message!"
     try CryptoSign.open(forged, pk)
-      h.assert_failed("Shouldn't verify if given a forged signed message.")
+      h.fail("Shouldn't verify if given a forged signed message.")
     end
     
     let lifted = signed.substring(0, (CryptoSign.mac_size().isize() - 1))
                + "Bad message"
     try CryptoSign.open(lifted, pk)
-      h.assert_failed("Shouldn't verify if given a lifted-signature message.")
+      h.fail("Shouldn't verify if given a lifted-signature message.")
     end
     
     try CryptoSign.open(signed, CryptoSign.keypair()._2)
-      h.assert_failed("Shouldn't verify if given the wrong key.")
+      h.fail("Shouldn't verify if given the wrong key.")
     end
     
     ///
@@ -47,16 +47,16 @@ class CryptoSignTest is UnitTest
     CryptoSign.verify_detached("My message!", pk, mac)
     
     try CryptoSign.verify_detached("Bad message", pk, mac)
-      h.assert_failed("Shouldn't verify if given the wrong message.")
+      h.fail("Shouldn't verify if given the wrong message.")
     end
     
     let mac' = CryptoSign.detached("Bad message", sk)
     try CryptoSign.verify_detached("My message!", pk, mac')
-      h.assert_failed("Shouldn't verify if given the wrong mac tag.")
+      h.fail("Shouldn't verify if given the wrong mac tag.")
     end
     
     try CryptoSign.verify_detached("My message!", CryptoSign.keypair()._2, mac)
-      h.assert_failed("Shouldn't verify if given the wrong key.")
+      h.fail("Shouldn't verify if given the wrong key.")
     end
     
     ///
@@ -72,12 +72,10 @@ class CryptoSignTest is UnitTest
     let crypt = CryptoBox("Hello, Bob!", nonce, ask, bpk)
     
     let message = CryptoBox.open(crypt, nonce, bsk, apk)
-    h.expect_eq[String](message, "Hello, Bob!")
+    h.assert_eq[String](message, "Hello, Bob!")
     
     let nonce' = CryptoBox.nonce()
     let crypt' = CryptoBox("Hi, Alice!", nonce', bsk, apk)
     
     let message' = CryptoBox.open(crypt', nonce', ask, bpk)
-    h.expect_eq[String](message', "Hi, Alice!")
-    
-    true
+    h.assert_eq[String](message', "Hi, Alice!")

@@ -6,7 +6,7 @@ class CryptoSecretBoxTest is UnitTest
   new iso create() => None
   fun name(): String => "sodium.CryptoSecretBox"
   
-  fun apply(h: TestHelper): TestResult? =>
+  fun apply(h: TestHelper)? =>
     let key   = CryptoSecretBox.key()
     let nonce = CryptoSecretBox.nonce()
     let crypt = CryptoSecretBox("My secret!", nonce, key)
@@ -16,14 +16,12 @@ class CryptoSecretBoxTest is UnitTest
     h.assert_eq[USize](crypt.string().size(), CryptoSecretBox.mac_size() + "My secret!".size())
     
     let message = CryptoSecretBox.open(crypt, nonce, key)
-    h.expect_eq[String](message, "My secret!")
+    h.assert_eq[String](message, "My secret!")
     
     try CryptoSecretBox.open(crypt, CryptoSecretBox.nonce(), key)
-      h.assert_failed("Shouldn't be able to open with the wrong nonce.")
+      h.fail("Shouldn't be able to open with the wrong nonce.")
     end
     
     try CryptoSecretBox.open(crypt, nonce, CryptoSecretBox.key())
-      h.assert_failed("Shouldn't be able to open with the wrong key.")
+      h.fail("Shouldn't be able to open with the wrong key.")
     end
-    
-    true

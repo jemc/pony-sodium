@@ -6,7 +6,7 @@ class CryptoBoxTest is UnitTest
   new iso create() => None
   fun name(): String => "sodium.CryptoBox"
   
-  fun apply(h: TestHelper): TestResult? =>
+  fun apply(h: TestHelper)? =>
     (let ask, let apk) = CryptoBox.keypair() // Alice's public and secret key
     (let bsk, let bpk) = CryptoBox.keypair() // Bob's   public and secret key
     (let csk, let cpk) = CryptoBox.keypair() // Cyril's public and secret key
@@ -23,20 +23,20 @@ class CryptoBoxTest is UnitTest
     h.assert_eq[USize](crypt.size(), CryptoBox.mac_size() + "Hello, Bob!".size())
     
     let message = CryptoBox.open(crypt, nonce, bsk, apk)
-    h.expect_eq[String](message, "Hello, Bob!")
+    h.assert_eq[String](message, "Hello, Bob!")
     
     let nonce' = CryptoBox.nonce()
     let crypt' = CryptoBox("Hi, Alice!", nonce', bsk, apk)
     
     let message' = CryptoBox.open(crypt', nonce', ask, bpk)
-    h.expect_eq[String](message', "Hi, Alice!")
+    h.assert_eq[String](message', "Hi, Alice!")
     
     try CryptoBox.open(crypt, nonce, csk, apk)
-      h.assert_failed("Cyril shouldn't be able to open Alice's message to Bob.")
+      h.fail("Cyril shouldn't be able to open Alice's message to Bob.")
     end
     
     try CryptoBox.open(crypt', nonce', csk, bpk)
-      h.assert_failed("Cyril shouldn't be able to open Bob's message to Alice.")
+      h.fail("Cyril shouldn't be able to open Bob's message to Alice.")
     end
     
     ///
@@ -46,16 +46,14 @@ class CryptoBoxTest is UnitTest
     h.assert_eq[USize](CryptoBox.scalar_size(), CryptoBox.public_key_size())
     
     if not (apk.string() == CryptoBox.scalar_mult_base(ask).string()) then
-      h.assert_failed("Alice's public key should be derivable from her secret key.")
+      h.fail("Alice's public key should be derivable from her secret key.")
     end
     
     if not (bpk.string() == CryptoBox.scalar_mult_base(bsk).string()) then
-      h.assert_failed("Bob's public key should be derivable from his secret key.")
+      h.fail("Bob's public key should be derivable from his secret key.")
     end
     
     if not (CryptoBox.scalar_mult(bsk, apk).string()
          == CryptoBox.scalar_mult(ask, bpk).string()) then
-      h.assert_failed("Alice and Bob's keys should be able to derive a shared secret.")
+      h.fail("Alice and Bob's keys should be able to derive a shared secret.")
     end
-    
-    true

@@ -2,7 +2,7 @@
 use "lib:sodium"
 
 primitive _Lib
-  fun _init(env: Env) =>
+  fun _init() =>
     @sodium_init[None]()
 
 // Platform-specific typdefs
