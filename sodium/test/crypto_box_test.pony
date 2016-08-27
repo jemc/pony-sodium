@@ -38,7 +38,25 @@ class CryptoBoxTest is UnitTest
     try CryptoBox.open(crypt', nonce', csk, bpk)
       h.fail("Cyril shouldn't be able to open Bob's message to Alice.")
     end
-    
+
+    ///
+    // Key pairs generated with seeds
+
+    (let sks, let pks) = CryptoBox.seed_keypair(CryptoBoxSeed("Hello seeds!"))
+
+    h.assert_eq[USize](sks.string().size(), CryptoBox.secret_key_size())
+    h.assert_eq[USize](pks.string().size(), CryptoBox.public_key_size())
+
+    (let sks', let pks') = CryptoBox.seed_keypair(CryptoBoxSeed("Hello seeds!"))
+
+    h.assert_eq[String](sks.string(), sks'.string())
+    h.assert_eq[String](pks.string(), pks'.string())
+
+    (let sksb, let pksb) = CryptoBox.seed_keypair(CryptoBoxSeed("Hello world!"))
+
+    h.assert_ne[String](sks.string(), sksb.string())
+    h.assert_ne[String](pks.string(), pksb.string())
+
     ///
     // Scalar multiplication (Diffie-Hellman) tests
     

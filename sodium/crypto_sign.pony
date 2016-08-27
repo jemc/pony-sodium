@@ -1,6 +1,14 @@
 
 use "lib:sodium"
 
+class val CryptoSignSeed
+  let _inner: String
+  fun string(): String => _inner
+  fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun is_valid(): Bool => _inner.size() == CryptoSign.secret_key_size()
+  new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
+    _inner = recover String.append(consume buf) end
+
 class val CryptoSignSecretKey
   let _inner: String
   fun string(): String => _inner
@@ -28,6 +36,7 @@ class val CryptoSignMac
     _inner = recover String.append(consume buf) end
 
 primitive CryptoSign
+  fun tag seed_size(): USize => @crypto_sign_seedbytes[USize]().usize()
   fun tag secret_key_size(): USize => @crypto_sign_secretkeybytes[USize]().usize()
   fun tag public_key_size(): USize => @crypto_sign_publickeybytes[USize]().usize()
   fun tag mac_size(): USize        => @crypto_sign_bytes[USize]().usize()
@@ -47,7 +56,15 @@ primitive CryptoSign
     let pk_size = public_key_size(); let pk = _make_buffer(pk_size)
     if 0 != @crypto_sign_keypair[_Int](pk.cstring(), sk.cstring()) then error end
     (CryptoSignSecretKey(consume sk), CryptoSignPublicKey(consume pk))
-  
+
+  fun tag seed_keypair(seed: CryptoSignSeed): (CryptoSignSecretKey, CryptoSignPublicKey)? =>
+    let sk_size = secret_key_size(); let sk = _make_buffer(sk_size)
+    let pk_size = public_key_size(); let pk = _make_buffer(pk_size)
+    if 0 != @crypto_sign_seed_keypair[_Int](
+      pk.cstring(), sk.cstring(), seed.cstring()
+    ) then error end
+    (CryptoSignSecretKey(consume sk), CryptoSignPublicKey(consume pk))
+
   fun tag apply(m: String, sk: CryptoSignSecretKey): String? =>
     if not sk.is_valid() then error end
     var buf_size: USize = m.size() + mac_size()
