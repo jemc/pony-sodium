@@ -58,25 +58,25 @@ class CryptoSignTest is UnitTest
     try CryptoSign.verify_detached("My message!", CryptoSign.keypair()._2, mac)
       h.fail("Shouldn't verify if given the wrong key.")
     end
-
+    
     ///
     // Key pairs generated with seeds
-
-    (let sks, let pks) = CryptoSign.seed_keypair(CryptoSignSeed("Hello seeds!"))
-
+    
+    (let sks, let pks) = CryptoSign.seed_keypair(CryptoSignSeed("Hello seeds!                    "))
+    
     h.assert_eq[USize](sks.string().size(), CryptoSign.secret_key_size())
     h.assert_eq[USize](pks.string().size(), CryptoSign.public_key_size())
     
-    (let sks', let pks') = CryptoSign.seed_keypair(CryptoSignSeed("Hello seeds!"))
-
+    (let sks', let pks') = CryptoSign.seed_keypair(CryptoSignSeed("Hello seeds!                    "))
+    
     h.assert_eq[String](sks.string(), sks'.string())
     h.assert_eq[String](pks.string(), pks'.string())
     
-    (let sksb, let pksb) = CryptoSign.seed_keypair(CryptoSignSeed("Hello world!"))
-
+    (let sksb, let pksb) = CryptoSign.seed_keypair(CryptoSignSeed("Hello world!                    "))
+    
     h.assert_ne[String](sks.string(), sksb.string())
     h.assert_ne[String](pks.string(), pksb.string())
-
+    
     ///
     // Convert to CryptoBox (curve) keys and use with normal CryptoBox keys
     
