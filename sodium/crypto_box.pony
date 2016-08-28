@@ -34,7 +34,7 @@ class val CryptoBoxNonce
     _inner = recover String.append(consume buf) end
 
 primitive CryptoBox
-  fun tag seed_size(): USize => @crypto_box_seedbytes[USize]().usize()
+  fun tag seed_size(): USize       => @crypto_box_seedbytes[USize]().usize()
   fun tag secret_key_size(): USize => @crypto_box_secretkeybytes[USize]().usize()
   fun tag public_key_size(): USize => @crypto_box_publickeybytes[USize]().usize()
   fun tag nonce_size(): USize      => @crypto_box_noncebytes[USize]().usize()
@@ -59,7 +59,7 @@ primitive CryptoBox
     let pk_size = public_key_size(); let pk = _make_buffer(pk_size)
     if 0 != @crypto_box_keypair[_Int](pk.cstring(), sk.cstring()) then error end
     (CryptoBoxSecretKey(consume sk), CryptoBoxPublicKey(consume pk))
-
+  
   fun tag seed_keypair(seed: CryptoBoxSeed): (CryptoBoxSecretKey, CryptoBoxPublicKey)? =>
     let sk_size = secret_key_size(); let sk = _make_buffer(sk_size)
     let pk_size = public_key_size(); let pk = _make_buffer(pk_size)
@@ -67,8 +67,7 @@ primitive CryptoBox
       pk.cstring(), sk.cstring(), seed.cstring()
     ) then error end
     (CryptoBoxSecretKey(consume sk), CryptoBoxPublicKey(consume pk))
-
-
+  
   fun tag apply(m: String, n: CryptoBoxNonce, sk: CryptoBoxSecretKey, pk: CryptoBoxPublicKey): String? =>
     if not (n.is_valid() and pk.is_valid() and sk.is_valid()) then error end
     let buf_size = m.size() + mac_size()
