@@ -61,6 +61,7 @@ primitive CryptoBox
     (CryptoBoxSecretKey(consume sk), CryptoBoxPublicKey(consume pk))
   
   fun tag seed_keypair(seed: CryptoBoxSeed): (CryptoBoxSecretKey, CryptoBoxPublicKey)? =>
+    if not seed.is_valid() then error end
     let sk_size = secret_key_size(); let sk = _make_buffer(sk_size)
     let pk_size = public_key_size(); let pk = _make_buffer(pk_size)
     if 0 != @crypto_box_seed_keypair[_Int](
