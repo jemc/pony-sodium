@@ -1,6 +1,7 @@
 
 use "ponytest"
 use ".."
+use "debug"
 
 class CryptoSecretBoxTest is UnitTest
   new iso create() => None

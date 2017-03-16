@@ -4,26 +4,26 @@ use "lib:sodium"
 class val CryptoBoxSecretKey
   let _inner: String
   fun string(): String => _inner
-  fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun cpointer(): Pointer[U8] tag => _inner.cpointer()
   fun is_valid(): Bool => _inner.size() == CryptoBox.secret_key_size()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
-    _inner = recover String.append(consume buf) end
+    _inner = recover String.>append(consume buf) end
 
 class val CryptoBoxPublicKey
   let _inner: String
   fun string(): String => _inner
-  fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun cpointer(): Pointer[U8] tag => _inner.cpointer()
   fun is_valid(): Bool => _inner.size() == CryptoBox.public_key_size()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
-    _inner = recover String.append(consume buf) end
+    _inner = recover String.>append(consume buf) end
 
 class val CryptoBoxNonce
   let _inner: String
   fun string(): String => _inner
-  fun cstring(): Pointer[U8] tag => _inner.cstring()
+  fun cpointer(): Pointer[U8] tag => _inner.cpointer()
   fun is_valid(): Bool => _inner.size() == CryptoBox.nonce_size()
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
-    _inner = recover String.append(consume buf) end
+    _inner = recover String.>append(consume buf) end
 
 primitive CryptoBox
   fun tag secret_key_size(): USize => @crypto_box_secretkeybytes[USize]().usize()
@@ -33,13 +33,13 @@ primitive CryptoBox
   fun tag scalar_size(): USize     => @crypto_scalarmult_bytes[USize]().usize()
   
   fun tag _make_buffer(size: USize): String iso^ =>
-    recover String.from_cstring(
+    recover String.from_cpointer(
       @pony_alloc[Pointer[U8]](@pony_ctx[Pointer[None] iso](), size), size
     ) end
   
   fun tag random_bytes(size: USize): String iso^ =>
     let buf = _make_buffer(size)
-    @randombytes_buf[None](buf.cstring(), size)
+    @randombytes_buf[None](buf.cpointer(), size)
     buf
   
   fun tag nonce(): CryptoBoxNonce =>
@@ -48,7 +48,7 @@ primitive CryptoBox
   fun tag keypair(): (CryptoBoxSecretKey, CryptoBoxPublicKey)? =>
     let sk_size = secret_key_size(); let sk = _make_buffer(sk_size)
     let pk_size = public_key_size(); let pk = _make_buffer(pk_size)
-    if 0 != @crypto_box_keypair[_Int](pk.cstring(), sk.cstring()) then error end
+    if 0 != @crypto_box_keypair[_Int](pk.cpointer(), sk.cpointer()) then error end
     (CryptoBoxSecretKey(consume sk), CryptoBoxPublicKey(consume pk))
   
   fun tag apply(m: String, n: CryptoBoxNonce, sk: CryptoBoxSecretKey, pk: CryptoBoxPublicKey): String? =>
@@ -56,7 +56,7 @@ primitive CryptoBox
     let buf_size = m.size() + mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_box_easy[_Int](
-      buf.cstring(), m.cstring(), m.size(), n.cstring(), pk.cstring(), sk.cstring()
+      buf.cpointer(), m.cpointer(), m.size(), n.cpointer(), pk.cpointer(), sk.cpointer()
     ) then error end
     consume buf
   
@@ -65,7 +65,7 @@ primitive CryptoBox
     let buf_size = c.size() - mac_size()
     let buf = _make_buffer(buf_size)
     if 0 != @crypto_box_open_easy[_Int](
-      buf.cstring(), c.cstring(), c.size(), n.cstring(), pk.cstring(), sk.cstring()
+      buf.cpointer(), c.cpointer(), c.size(), n.cpointer(), pk.cpointer(), sk.cpointer()
     ) then error end
     consume buf
   
@@ -73,7 +73,7 @@ primitive CryptoBox
     if not sk.is_valid() then error end
     let buf = _make_buffer(public_key_size())
     if 0 != @crypto_scalarmult_base[_Int](
-      buf.cstring(), sk.cstring()
+      buf.cpointer(), sk.cpointer()
     ) then error end
     CryptoBoxPublicKey(consume buf)
   
@@ -81,6 +81,6 @@ primitive CryptoBox
     if not (pk.is_valid() and sk.is_valid()) then error end
     let buf = _make_buffer(scalar_size())
     if 0 != @crypto_scalarmult[_Int](
-      buf.cstring(), sk.cstring(), pk.cstring()
+      buf.cpointer(), sk.cpointer(), pk.cpointer()
     ) then error end
     consume buf
