@@ -14,7 +14,7 @@ class val CryptoSignSecretKey
   fun string(): String => _inner
   fun cpointer(): Pointer[U8] tag => _inner.cpointer()
   fun is_valid(): Bool => _inner.size() == CryptoSign.secret_key_size()
-  fun val to_curve(): CryptoBoxSecretKey? => CryptoSign._secret_key_to_curve(this)
+  fun val to_curve(): CryptoBoxSecretKey? => CryptoSign._secret_key_to_curve(this)?
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.>append(consume buf) end
 
@@ -23,7 +23,7 @@ class val CryptoSignPublicKey
   fun string(): String => _inner
   fun cpointer(): Pointer[U8] tag => _inner.cpointer()
   fun is_valid(): Bool => _inner.size() == CryptoSign.public_key_size()
-  fun val to_curve(): CryptoBoxPublicKey? => CryptoSign._public_key_to_curve(this)
+  fun val to_curve(): CryptoBoxPublicKey? => CryptoSign._public_key_to_curve(this)?
   new val create(buf: (ReadSeq[U8] iso | ReadSeq[U8] val)) =>
     _inner = recover String.>append(consume buf) end
 
