@@ -1,5 +1,5 @@
 
-use "ponytest"
+use "pony_test"
 use ".."
 
 class CryptoHashTest is UnitTest
